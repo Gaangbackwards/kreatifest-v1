@@ -17,6 +17,11 @@ test('menerima origin frontend yang terdaftar', () => {
   assert.equal(isOriginAllowed('https://www.domain.tld'), true)
 })
 
+test('menerima domain production dan preview frontend Kreatifest', () => {
+  assert.equal(isOriginAllowed('https://kreatifest-v1-v16n.vercel.app'), true)
+  assert.equal(isOriginAllowed('https://kreatifest-v1-v16n-git-main.vercel.app'), true)
+})
+
 test('menerima domain preview Vercel milik project yang sama', () => {
   assert.equal(isOriginAllowed('https://my-app.vercel.app'), true)
   assert.equal(isOriginAllowed('https://my-app-a1b2c3d4.vercel.app'), true)
@@ -54,6 +59,10 @@ test('middleware CORS menjawab request, bukan menggantung', async (context) => {
   const allowed = await call('https://my-app.vercel.app')
   assert.equal(allowed.status, 200)
   assert.equal(allowed.headers.get('access-control-allow-origin'), 'https://my-app.vercel.app')
+
+  const production = await call('https://kreatifest-v1-v16n.vercel.app')
+  assert.equal(production.status, 200)
+  assert.equal(production.headers.get('access-control-allow-origin'), 'https://kreatifest-v1-v16n.vercel.app')
 
   const rejected = await call('https://other-app.vercel.app')
   assert.equal(rejected.status, 200)

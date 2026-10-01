@@ -28,7 +28,7 @@ Copy `.env.example` to `.env` for local development. In production set the same 
 | `CACHE_TTL_MS` | `0` | In-memory cache lifetime in minutes. `0` re-fetches the feeds on every request, which is what you want while developing. Use `15` in production. |
 | `RATE_LIMIT_MAX` | `0` | Requests per minute per IP on `/api/news`. `0` disables the limiter entirely. |
 | `TRUST_PROXY_HOPS` | `0` | Number of trusted reverse proxies. Set to `1` behind Vercel or a proxy. |
-| `FRONTEND_ORIGINS` | `localhost:5173` | Comma-separated allowed frontend origins. Supports `*` as a host-label wildcard, for example `https://my-app*.vercel.app`. |
+| `FRONTEND_ORIGINS` | Local development and `https://kreatifest-v1-v16n*.vercel.app` | Optional comma-separated additional frontend origins. The production Vercel domain and its previews are already allowed. Supports `*` as a host-label wildcard. |
 
 ### Why `RATE_LIMIT_MAX` must be `0` on Vercel
 
@@ -40,7 +40,7 @@ The current sources are Search Engine Journal, Social Media Today, and HubSpot M
 
 A request re-fetches the feeds when it asks explicitly, with `?refresh=1` or with a `Cache-Control: no-cache` header that is not part of a conditional request. Those responses are sent with `Cache-Control: no-store` so no browser or proxy cache sits in front of them. Any other request is served with `Cache-Control: public, max-age=60` and an `ETag` derived from the refresh timestamp, so a repeat load revalidates with `304` instead of downloading the payload again.
 
-> **`Cache-Control: no-cache` is deliberately ignored on conditional requests.** Browsers and `fetch` automatically attach that header to every request carrying `If-None-Match` or `If-Modified-Since`. Treating it as a force signal would make every page reload bypass the cache, refetch all four RSS feeds, change the `ETag`, and make `304` impossible. The frontend therefore sends that header only in development, and the manual refresh button revalidates against the 15-minute cache in production rather than forcing a refetch.
+> **`Cache-Control: no-cache` is deliberately ignored on conditional requests.** Browsers and `fetch` automatically attach that header to every request carrying `If-None-Match` or `If-Modified-Since`. Treating it as a force signal would make every page reload bypass the cache, refetch all five RSS feeds, change the `ETag`, and make `304` impossible. The frontend therefore sends that header only in development, and the manual refresh button revalidates against the 15-minute cache in production rather than forcing a refetch.
 
 `GET /api/health` reports `ttlMinutes`, `articleCount`, `lastUpdatedAt`, `lastRefreshAt`, `stale`, `refreshInProgress`, and `rateLimitMax` so you can confirm the cache configuration of a deployed instance. A `lastRefreshAt` of `null` means no refresh has completed yet on this instance.
 
@@ -58,11 +58,9 @@ Deploy the frontend and backend as two separate Vercel projects from the same Gi
 | Framework Preset | Vite |
 | Build Command | `npm run build` |
 | Output Directory | `dist` |
-| Environment | `VITE_NEWS_API_URL=https://<project-B>.vercel.app` (Production and Preview) |
+| API URL | Defaults to `https://backend-v1-c5vq.vercel.app`; `VITE_NEWS_API_URL` can override it |
 
-`server.proxy` in `vite.config.js` only applies to the Vite dev server. In production the frontend calls the backend by absolute URL, so `VITE_NEWS_API_URL` is required. If you skip it, `/api/news` returns `404` because nothing proxies it.
-
-Create the backend project first and copy its deployment URL into `VITE_NEWS_API_URL` in the frontend project's Environment Variables. Redeploy the frontend after adding or changing this variable because Vite embeds it at build time.
+`server.proxy` in `vite.config.js` only applies to the Vite dev server. In production the frontend calls the backend by absolute URL. The backend URL is already the frontend's default, so no Vercel environment variable is required unless the backend domain changes.
 
 **Project B, backend (Express)**
 
@@ -71,9 +69,9 @@ Create the backend project first and copy its deployment URL into `VITE_NEWS_API
 | Root Directory | `backend` |
 | Framework Preset | Express, or "Other" if it is not detected |
 | Node.js Version | 22.x |
-| Environment | `CACHE_TTL_MS=15`, `RATE_LIMIT_MAX=0`, `TRUST_PROXY_HOPS=1`, `FRONTEND_ORIGINS=https://<project-A>*.vercel.app` |
+| Environment | `CACHE_TTL_MS=15`, `RATE_LIMIT_MAX=0`, `TRUST_PROXY_HOPS=1` |
 
-With `backend` as the Root Directory, Vercel detects `src/server.js` as the Express entry point. No custom builds or routes are required. Set `FRONTEND_ORIGINS` to the frontend project's Vercel hostname plus `*.vercel.app` preview suffix as shown; the wildcard is limited to that project name and does not allow every Vercel project. Add the variables for both Production and Preview environments.
+With `backend` as the Root Directory, Vercel detects `src/server.js` as the Express entry point. No custom builds or routes are required. The current frontend production and preview domains are allowed by default. Set `FRONTEND_ORIGINS` only if you add a different frontend domain.
 
 In short: create one Vercel project with Root Directory `backend`, then another with Root Directory `frontend`. Do not set either project's Root Directory to `./`.
 
