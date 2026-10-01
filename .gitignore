@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+.env.local
+.env.*.local
+.vercel/
+npm-debug.log*
+.DS_Store
+
+# Salinan duplikat frontend (sudah tidak dipakai, kode sebenarnya ada di frontend/src/)
+frontend/frontend/
