@@ -14,6 +14,7 @@ const FORCE_JOIN_WINDOW_MS = 10 * 1000
 const sources = [
   { name: 'Search Engine Journal', region: 'international', url: 'https://www.searchenginejournal.com/feed/' },
   { name: 'Social Media Today', region: 'international', url: 'https://www.socialmediatoday.com/feeds/news/' },
+  { name: 'HubSpot Marketing', region: 'international', url: 'https://blog.hubspot.com/marketing/rss.xml' },
   { name: 'Marketing.co.id', region: 'indonesia', url: 'https://marketing.co.id/feed/' },
   { name: 'DailySocial', region: 'indonesia', url: 'https://dailysocial.id/feed' },
 ]
