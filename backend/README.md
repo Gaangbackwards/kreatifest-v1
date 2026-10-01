@@ -48,7 +48,7 @@ A request re-fetches the feeds when it asks explicitly, with `?refresh=1` or wit
 
 ## Deploying to Vercel
 
-The frontend and backend are two separate Vercel projects.
+Deploy the frontend and backend as two separate Vercel projects from the same GitHub repository. On the New Project page shown in the screenshot, choose **Import single project** for each application; do not import the repository root as a multi-service project. The repository-root `vercel.json` is intentionally absent because each project gets its own Root Directory and Vercel detects its framework there.
 
 **Project A, frontend (static)**
 
@@ -58,9 +58,11 @@ The frontend and backend are two separate Vercel projects.
 | Framework Preset | Vite |
 | Build Command | `npm run build` |
 | Output Directory | `dist` |
-| Environment | `VITE_NEWS_API_URL=https://<project-B>.vercel.app` |
+| Environment | `VITE_NEWS_API_URL=https://<project-B>.vercel.app` (Production and Preview) |
 
 `server.proxy` in `vite.config.js` only applies to the Vite dev server. In production the frontend calls the backend by absolute URL, so `VITE_NEWS_API_URL` is required. If you skip it, `/api/news` returns `404` because nothing proxies it.
+
+Create the backend project first and copy its deployment URL into `VITE_NEWS_API_URL` in the frontend project's Environment Variables. Redeploy the frontend after adding or changing this variable because Vite embeds it at build time.
 
 **Project B, backend (Express)**
 
@@ -71,7 +73,9 @@ The frontend and backend are two separate Vercel projects.
 | Node.js Version | 22.x |
 | Environment | `CACHE_TTL_MS=15`, `RATE_LIMIT_MAX=0`, `TRUST_PROXY_HOPS=1`, `FRONTEND_ORIGINS=https://<project-A>*.vercel.app` |
 
-With `backend` as the Root Directory, Vercel finds `src/server.js` because it is one of the recognised entry points. `vercel.json` pins the runtime; no builds or routes are configured. Use the project-name wildcard rather than `*.vercel.app` so preview deployments of your own frontend are accepted without allowing every Vercel project on the internet.
+With `backend` as the Root Directory, Vercel detects `src/server.js` as the Express entry point. No custom builds or routes are required. Set `FRONTEND_ORIGINS` to the frontend project's Vercel hostname plus `*.vercel.app` preview suffix as shown; the wildcard is limited to that project name and does not allow every Vercel project. Add the variables for both Production and Preview environments.
+
+In short: create one Vercel project with Root Directory `backend`, then another with Root Directory `frontend`. Do not set either project's Root Directory to `./`.
 
 ## Deploying to Hostinger
 
