@@ -1,4 +1,4 @@
-const apiBaseUrl = (import.meta.env.VITE_NEWS_API_URL || '').replace(/\/$/, '')
+const apiBaseUrl = (import.meta.env.VITE_NEWS_API_URL || 'https://backend-v1-c5vq.vercel.app/').replace(/\/$/, '')
 
 /**
  * Selalu meminta data terbaru: `cache: 'no-store'` menembus cache HTTP browser,
