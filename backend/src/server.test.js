@@ -18,6 +18,7 @@ test('menerima origin frontend yang terdaftar', () => {
 })
 
 test('menerima domain production dan preview frontend Kreatifest', () => {
+  assert.equal(isOriginAllowed('https://kreatifest-v1.vercel.app'), true)
   assert.equal(isOriginAllowed('https://kreatifest-v1-v16n.vercel.app'), true)
   assert.equal(isOriginAllowed('https://kreatifest-v1-v16n-git-main.vercel.app'), true)
 })

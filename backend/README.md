@@ -58,7 +58,7 @@ Deploy the frontend and backend as two separate Vercel projects from the same Gi
 | Framework Preset | Vite |
 | Build Command | `npm run build` |
 | Output Directory | `dist` |
-| API URL | Defaults to `https://backend-v1-c5vq.vercel.app`; `VITE_NEWS_API_URL` can override it |
+| API URL | Defaults to `https://backend-v1.vercel.app`; `VITE_NEWS_API_URL` can override it |
 
 `server.proxy` in `vite.config.js` only applies to the Vite dev server. In production the frontend calls the backend by absolute URL. The backend URL is already the frontend's default, so no Vercel environment variable is required unless the backend domain changes.
 

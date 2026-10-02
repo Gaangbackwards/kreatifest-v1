@@ -1,4 +1,4 @@
-const apiBaseUrl = (import.meta.env.VITE_NEWS_API_URL || 'https://backend-v1-c5vq.vercel.app').replace(/\/$/, '')
+const apiBaseUrl = (import.meta.env.VITE_NEWS_API_URL || 'https://backend-v1.vercel.app').replace(/\/$/, '')
 
 /** Hindari cache browser; hanya development yang meminta refresh backend secara paksa. */
 export async function fetchLatestNews(signal) {
